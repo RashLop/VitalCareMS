@@ -199,7 +199,7 @@ namespace MSUsuarios.App.Servicios
                 ApellidoPaterno = StringHelper.LimpiarTexto(dto.ApellidoPaterno),
                 ApellidoMaterno = StringHelper.LimpiarTexto(dto.ApellidoMaterno),
                 Ci = StringHelper.LimpiarCI(dto.Ci),
-                CiExtencion = StringHelper.LimpiarTextoMayus(dto.CiExtencion),
+                CiExtencion = StringHelper.LimpiarTextoMayus(dto.CiExtencion ?? string.Empty),
                 Telefono = StringHelper.SoloNumeros(dto.Telefono),
                 Email = StringHelper.LimpiarTextoMinus(dto.Email),
                 UserName = StringHelper.LimpiarTextoMinus(dto.UserName),
@@ -218,14 +218,18 @@ namespace MSUsuarios.App.Servicios
                 usuario.Nombres = StringHelper.LimpiarTexto(dto.Nombres);
 
             usuario.ApellidoPaterno = StringHelper.LimpiarTexto(dto.ApellidoPaterno);
-            usuario.ApellidoMaterno = StringHelper.LimpiarTexto(dto.ApellidoMaterno);
+            usuario.ApellidoMaterno = StringHelper.LimpiarTexto(dto.ApellidoMaterno ?? string.Empty);
             usuario.Ci = StringHelper.LimpiarCI(dto.Ci);
-            usuario.CiExtencion = StringHelper.LimpiarTextoMayus(dto.CiExtencion);
+            usuario.CiExtencion = StringHelper.LimpiarTextoMayus(dto.CiExtencion ?? string.Empty);
             usuario.Telefono = StringHelper.SoloNumeros(dto.Telefono);
             usuario.Email = StringHelper.LimpiarTextoMinus(dto.Email);
 
             if (!string.IsNullOrWhiteSpace(dto.Role))
                 usuario.Role = StringHelper.LimpiarTexto(dto.Role);
+
+            // Auditoría: actualizar el usuario que realizó el cambio
+            if (dto.IdSessionDelQueActualiza.HasValue && dto.IdSessionDelQueActualiza.Value > 0)
+                usuario.IdUsuarioCreador = dto.IdSessionDelQueActualiza.Value;
         }
 
         private UsuarioDto? ObtenerYMapear(Func<Usuario?> obtenerUsuario)

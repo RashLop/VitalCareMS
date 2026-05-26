@@ -208,86 +208,8 @@
                 </div>
             </div>
 
-            <!-- Action Button -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-actions">
-                        <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                            <i class="bi bi-pencil-square"></i> Editar Información
-                        </button>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </section>
 </div>
 
-<!-- Edit Profile Modal -->
-<div class="modal fade" id="editProfileModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-pencil-square"></i> Editar Información
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post">
-                <div class="modal-body">
-                    @if (Model.UsuarioActualizar != null)
-                    {
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="Nombres" class="form-label">Nombres</label>
-                                <input type="text" class="form-control" asp-for="UsuarioActualizar.Nombres" placeholder="Tu nombre" required>
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.Nombres"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="ApellidoPaterno" class="form-label">Primer Apellido</label>
-                                <input type="text" class="form-control" asp-for="UsuarioActualizar.ApellidoPaterno" placeholder="Primer apellido" required>
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.ApellidoPaterno"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="ApellidoMaterno" class="form-label">Segundo Apellido</label>
-                                <input type="text" class="form-control" asp-for="UsuarioActualizar.ApellidoMaterno" placeholder="Segundo apellido">
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.ApellidoMaterno"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="Email" class="form-label">Correo Electrónico</label>
-                                <input type="email" class="form-control" asp-for="UsuarioActualizar.Email" placeholder="tu.email@ejemplo.com" required>
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.Email"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="Telefono" class="form-label">Teléfono</label>
-                                <input type="tel" class="form-control" asp-for="UsuarioActualizar.Telefono" placeholder="71234567">
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.Telefono"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="Ci" class="form-label">Cédula de Identidad</label>
-                                <input type="text" class="form-control" asp-for="UsuarioActualizar.Ci" placeholder="C.I." required>
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.Ci"></span>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="CiExtencion" class="form-label">Expedido en</label>
-                                <input type="text" class="form-control" asp-for="UsuarioActualizar.CiExtencion" placeholder="Ex: LP, CB, SC">
-                                <span class="text-danger" asp-validation-for="UsuarioActualizar.CiExtencion"></span>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-lg"></i> Guardar Cambios
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>

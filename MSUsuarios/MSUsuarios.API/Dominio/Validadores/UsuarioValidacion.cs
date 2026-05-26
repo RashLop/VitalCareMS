@@ -85,8 +85,8 @@ namespace MSUsuarios.Dominio.Validadores
         private Result? ValidarCamposObligatorios(string? nombres, string? apellidoPaterno, string? apellidoMaterno, string? email)
         {
             Result? resultado = ValidarTextoSoloLetrasRequerido(nombres, "Nombres")
-                ?? ValidarTextoSoloLetrasRequerido(apellidoPaterno, "Apellido Paterno")
-                ?? ValidarTextoSoloLetrasOpcional(apellidoMaterno, "Apellido Materno");
+                ?? ValidarTextoSoloLetrasRequerido(apellidoPaterno, "Primer Apellido")
+                ?? ValidarTextoSoloLetrasOpcional(apellidoMaterno, "Segundo Apellido");
 
             if (resultado != null)
                 return resultado;
@@ -105,8 +105,8 @@ namespace MSUsuarios.Dominio.Validadores
             if (ci!.Contains(' '))
                 return Result.Fail("El numero de carnet no debe contener espacios.");
 
-            if (!Regex.IsMatch(ci, @"^\d{8}(?:-\d[A-Za-z])?$"))
-                return Result.Fail("El CI debe tener 8 digitos y un complemento opcional de hasta dos caracteres (Ej. 10000000-1B).");
+            if (!Regex.IsMatch(ci, @"^\d{1,}(?:-\d[A-Za-z])?$"))
+                return Result.Fail("El CI debe contener solo digitos numericos y un complemento opcional de hasta dos caracteres (Ej. 1000000-1B o 10000000-1B).");
 
             return null;
         }
@@ -114,7 +114,7 @@ namespace MSUsuarios.Dominio.Validadores
         private Result? ValidarCiExtension(string? ciExtension)
         {
             if (string.IsNullOrWhiteSpace(ciExtension))
-                return Result.Fail("La extension del CI es obligatoria.");
+                return null; // La extension es opcional
 
             if (!ExtensionesValidas.Contains(ciExtension!))
                 return Result.Fail("La extension del CI no es valida.");

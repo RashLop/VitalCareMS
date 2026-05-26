@@ -101,36 +101,75 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" asp-page-handler="ChangePassword">
+            <form method="post" asp-page-handler="ChangePassword" id="changePasswordForm">
                 <div class="modal-body">
+                    <!-- Contraseña Actual -->
                     <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Contraseña Actual</label>
-                        <input type="password" id="currentPassword" name="currentPassword" class="form-control" placeholder="Tu contraseña actual" required>
+                        <label for="currentPassword" class="form-label">
+                            <i class="bi bi-shield-check"></i> Contraseña Actual
+                        </label>
+                        <div class="input-group">
+                            <input type="password" id="currentPassword" name="currentPassword" class="form-control" placeholder="Escribe tu contraseña actual" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-text d-block mt-2">
+                            <span id="currentPasswordStatus"></span>
+                        </small>
                     </div>
 
+                    <hr>
+
+                    <!-- Nueva Contraseña -->
                     <div class="mb-3">
-                        <label for="newPassword" class="form-label">Nueva Contraseña</label>
-                        <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Tu nueva contraseña" required>
+                        <label for="newPassword" class="form-label">
+                            <i class="bi bi-key"></i> Nueva Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Tu nueva contraseña" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Requisitos de Contraseña en Tiempo Real -->
+                        <div class="mt-3 password-requirements">
+                            <small><strong>Requisitos:</strong></small>
+                            <div class="req-item" id="req-length">
+                                <i class="bi bi-circle"></i> <small>Al menos 8 caracteres</small>
+                            </div>
+                            <div class="req-item" id="req-uppercase">
+                                <i class="bi bi-circle"></i> <small>Una letra mayúscula (A-Z)</small>
+                            </div>
+                            <div class="req-item" id="req-lowercase">
+                                <i class="bi bi-circle"></i> <small>Una letra minúscula (a-z)</small>
+                            </div>
+                            <div class="req-item" id="req-number">
+                                <i class="bi bi-circle"></i> <small>Al menos un número (0-9)</small>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Confirmar Contraseña -->
                     <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirma tu nueva contraseña" required>
-                    </div>
-
-                    <div class="alert alert-info" role="alert">
-                        <small>
-                            <strong>Requisitos de contraseña:</strong><br>
-                            • Al menos 8 caracteres<br>
-                            • Una letra mayúscula<br>
-                            • Una letra minúscula<br>
-                            • Al menos un número
+                        <label for="confirmPassword" class="form-label">
+                            <i class="bi bi-check-circle"></i> Confirmar Contraseña
+                        </label>
+                        <div class="input-group">
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Confirma tu nueva contraseña" required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <small class="form-text d-block mt-2">
+                            <span id="confirmPasswordStatus"></span>
                         </small>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="submitBtn" disabled>
                         <i class="bi bi-check-lg"></i> Cambiar Contraseña
                     </button>
                 </div>
@@ -138,3 +177,186 @@
         </div>
     </div>
 </div>
+
+<style>
+    .password-requirements {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        border-left: 3px solid #dee2e6;
+    }
+
+    .req-item {
+        margin: 6px 0;
+        color: #6c757d;
+        transition: color 0.2s;
+    }
+
+    .req-item i {
+        margin-right: 6px;
+    }
+
+    .req-item.met {
+        color: #28a745;
+    }
+
+    .req-item.met i:before {
+        content: "\f26b"; /* checkmark icon */
+        font-family: 'bootstrap-icons';
+    }
+
+    .password-match {
+        margin-top: 8px;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .password-match.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .password-match.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .form-control.is-valid {
+        border-color: #28a745;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const submitBtn = document.getElementById('submitBtn');
+        const form = document.getElementById('changePasswordForm');
+
+        // Toggle password visibility
+        document.getElementById('toggleCurrentPassword').addEventListener('click', function() {
+            togglePasswordVisibility(currentPasswordInput, this);
+        });
+        document.getElementById('toggleNewPassword').addEventListener('click', function() {
+            togglePasswordVisibility(newPasswordInput, this);
+        });
+        document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+            togglePasswordVisibility(confirmPasswordInput, this);
+        });
+
+        function togglePasswordVisibility(inputElement, btnElement) {
+            const type = inputElement.getAttribute('type') === 'password' ? 'text' : 'password';
+            inputElement.setAttribute('type', type);
+            btnElement.querySelector('i').classList.toggle('bi-eye');
+            btnElement.querySelector('i').classList.toggle('bi-eye-slash');
+        }
+
+        // Validar Nueva Contraseña en Tiempo Real
+        newPasswordInput.addEventListener('input', function() {
+            validatePasswordRequirements(this.value);
+            validatePasswords();
+        });
+
+        // Validar Confirmación de Contraseña
+        confirmPasswordInput.addEventListener('input', function() {
+            validatePasswords();
+        });
+
+        // Validar Contraseña Actual
+        currentPasswordInput.addEventListener('input', function() {
+            validateCurrentPassword();
+        });
+
+        function validatePasswordRequirements(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password)
+            };
+
+            updateRequirementUI('req-length', requirements.length);
+            updateRequirementUI('req-uppercase', requirements.uppercase);
+            updateRequirementUI('req-lowercase', requirements.lowercase);
+            updateRequirementUI('req-number', requirements.number);
+
+            return Object.values(requirements).every(req => req);
+        }
+
+        function updateRequirementUI(elementId, isMet) {
+            const element = document.getElementById(elementId);
+            if (isMet) {
+                element.classList.add('met');
+                element.querySelector('i').innerHTML = '<svg class="bi" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>';
+            } else {
+                element.classList.remove('met');
+            }
+        }
+
+        function validatePasswords() {
+            const newPass = newPasswordInput.value;
+            const confirmPass = confirmPasswordInput.value;
+            const confirmStatusEl = document.getElementById('confirmPasswordStatus');
+            const requirements = validatePasswordRequirements(newPass);
+
+            if (confirmPass === '') {
+                confirmStatusEl.innerHTML = '';
+                confirmPasswordInput.classList.remove('is-valid', 'is-invalid');
+            } else if (newPass === confirmPass) {
+                confirmStatusEl.innerHTML = '<div class="password-match success"><i class="bi bi-check-circle-fill"></i> Las contraseñas coinciden</div>';
+                confirmPasswordInput.classList.add('is-valid');
+                confirmPasswordInput.classList.remove('is-invalid');
+            } else {
+                confirmStatusEl.innerHTML = '<div class="password-match error"><i class="bi bi-exclamation-circle-fill"></i> Las contraseñas no coinciden</div>';
+                confirmPasswordInput.classList.add('is-invalid');
+                confirmPasswordInput.classList.remove('is-valid');
+            }
+
+            updateSubmitButton();
+        }
+
+        function validateCurrentPassword() {
+            const currentPass = currentPasswordInput.value;
+            const statusEl = document.getElementById('currentPasswordStatus');
+
+            if (currentPass === '') {
+                statusEl.innerHTML = '';
+                currentPasswordInput.classList.remove('is-valid', 'is-invalid');
+            } else if (currentPass.length >= 8) {
+                statusEl.innerHTML = '<small style="color: #28a745;"><i class="bi bi-check-circle-fill"></i> Contraseña válida</small>';
+                currentPasswordInput.classList.add('is-valid');
+                currentPasswordInput.classList.remove('is-invalid');
+            } else {
+                statusEl.innerHTML = '<small style="color: #dc3545;"><i class="bi bi-exclamation-circle-fill"></i> Contraseña demasiado corta</small>';
+                currentPasswordInput.classList.add('is-invalid');
+                currentPasswordInput.classList.remove('is-valid');
+            }
+
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const currentPass = currentPasswordInput.value;
+            const newPass = newPasswordInput.value;
+            const confirmPass = confirmPasswordInput.value;
+            const requirementsMet = validatePasswordRequirements(newPass);
+
+            const allValid = currentPass.length > 0 && 
+                            newPass.length > 0 && 
+                            confirmPass.length > 0 && 
+                            newPass === confirmPass && 
+                            requirementsMet;
+
+            submitBtn.disabled = !allValid;
+        }
+    });
+</script>
